@@ -82,8 +82,8 @@ export default function CameraPage () {
   const decodeBarcode = () => {
     if (activeImage === 'bar') {
       const video = videoRef.current;
-  
-      if (video && video.readyState === 4) { // Comprueba si el video se ha cargado completamente
+
+      if (video) {
         Quagga.init({
           inputStream: {
             name: 'Live',
@@ -94,14 +94,14 @@ export default function CameraPage () {
             },
           },
           decoder: {
-            readers: ['upc_reader'],
+            readers: ['ean_reader'],
           },
         }, (err) => {
           if (err) {
             console.error('Error initializing Quagga:', err);
             return;
           }
-  
+
           Quagga.start();
           Quagga.onDetected((data) => {
             console.log('Código de barras detectado:', data.codeResult.code);
@@ -111,12 +111,10 @@ export default function CameraPage () {
             setTimeout(() => {
               setShowBarcodeMessage(false);
               setDetectedBarcode('');
-            }, );
+            }, 3000);
             navigate('/ResultPage', { state: { detectedCode: data.codeResult.code } });
           });
         });
-      } else {
-        console.log('El video no se ha cargado completamente');
       }
     }
   };
@@ -148,15 +146,11 @@ export default function CameraPage () {
 
   return (
     <div>
-      <div className='hdr'>
-       <Link to="/">
-    <img
-      className="logo-x-r"
-      src="https://icones.pro/wp-content/uploads/2021/08/icone-x-grise.png"
-      alt="logo x"
-    />
-  </Link>
-  </div>
+      <div className='head'>
+      <Link to='/'>
+        <img className='logo-x' src='https://icones.pro/wp-content/uploads/2021/08/icone-x-grise.png' alt='logo x'/>
+        </Link>
+      </div>
       <div className='page'>
         {isTitleVisible && <h2 className='t-p'>Escaneando...</h2>}
         <div>
@@ -184,31 +178,28 @@ export default function CameraPage () {
             </div>
           )}
           <video ref={videoRef} autoPlay playsInline className="camera-video"></video>
-          <div className='lineaMedioCamara'></div>
         </div>
         <div className='file-logs'>
           <div className='log-box'>
             <div className={`log-i-b ${activeImage === 'bar' ? 'active' : ''}`} onClick={() => handleImageClick('bar')}>
               <img className='logs' src='https://cdn-icons-png.flaticon.com/512/39/39881.png' alt='Codigo de barras'/>
             </div>
-            <span className='letrasIconos'>Código de barras</span>
+            <span>Código de barras</span>
           </div>
           <div className='log-box'>
             <div className={`log-i-a ${activeImage === 'qr' ? 'active' : ''}`} onClick={() => handleImageClick('qr')}>
               <img className='logs' src='https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Codigo_QR.svg/1200px-Codigo_QR.svg.png' alt='Codigo QR'/>
             </div>
-            <span className='letrasIconos' >Código QR</span>
+            <span>Código QR</span>
           </div>
           <div className='log-box'>
             <div className={`log-i-c ${activeImage === 'nfc' ? 'active' : ''}`} onClick={() => handleImageClick('nfc')}>
               <img className='logs' src='https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/NFC_logo.svg/2000px-NFC_logo.svg.png' alt='NFC'/>
             </div>
-            <span className='letrasIconos' >NFC</span>
+            <span>NFC</span>
           </div>
         </div>
       </div>
     </div>
   );
 };
-
-
